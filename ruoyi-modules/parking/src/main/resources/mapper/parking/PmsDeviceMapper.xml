@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.parking.mapper.PmsDeviceMapper">
+    
+    <resultMap type="PmsDevice" id="PmsDeviceResult">
+        <result property="deviceId"    column="device_id"    />
+        <result property="mac"    column="mac"    />
+        <result property="connectionTime"    column="connection_time"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectPmsDeviceVo">
+        select device_id, mac, connection_time, status from pms_device
+    </sql>
+
+    <select id="selectPmsDeviceList" parameterType="PmsDevice" resultMap="PmsDeviceResult">
+        <include refid="selectPmsDeviceVo"/>
+        <where>  
+            <if test="connectionTime != null "> and connection_time = #{connectionTime}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectPmsDeviceByDeviceId" parameterType="Long" resultMap="PmsDeviceResult">
+        <include refid="selectPmsDeviceVo"/>
+        where device_id = #{deviceId}
+    </select>
+        
+    <insert id="insertPmsDevice" parameterType="PmsDevice" useGeneratedKeys="true" keyProperty="deviceId">
+        insert into pms_device
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="mac != null">mac,</if>
+            <if test="connectionTime != null">connection_time,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="mac != null">#{mac},</if>
+            <if test="connectionTime != null">#{connectionTime},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePmsDevice" parameterType="PmsDevice">
+        update pms_device
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="mac != null">mac = #{mac},</if>
+            <if test="connectionTime != null">connection_time = #{connectionTime},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where device_id = #{deviceId}
+    </update>
+
+    <delete id="deletePmsDeviceByDeviceId" parameterType="Long">
+        delete from pms_device where device_id = #{deviceId}
+    </delete>
+
+    <delete id="deletePmsDeviceByDeviceIds" parameterType="String">
+        delete from pms_device where device_id in 
+        <foreach item="deviceId" collection="array" open="(" separator="," close=")">
+            #{deviceId}
+        </foreach>
+    </delete>
+</mapper>

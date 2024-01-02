@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.parking.mapper.PmsZoneMapper">
+    
+    <resultMap type="PmsZone" id="PmsZoneResult">
+        <result property="zoneId"    column="zone_id"    />
+        <result property="name"    column="name"    />
+        <result property="total"    column="total"    />
+        <result property="location"    column="location"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectPmsZoneVo">
+        select zone_id, name, total, location, status from pms_zone
+    </sql>
+
+    <select id="selectPmsZoneList" parameterType="PmsZone" resultMap="PmsZoneResult">
+        <include refid="selectPmsZoneVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="total != null "> and total = #{total}</if>
+            <if test="location != null  and location != ''"> and location = #{location}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectPmsZoneByZoneId" parameterType="Long" resultMap="PmsZoneResult">
+        <include refid="selectPmsZoneVo"/>
+        where zone_id = #{zoneId}
+    </select>
+        
+    <insert id="insertPmsZone" parameterType="PmsZone" useGeneratedKeys="true" keyProperty="zoneId">
+        insert into pms_zone
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="total != null">total,</if>
+            <if test="location != null">location,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="total != null">#{total},</if>
+            <if test="location != null">#{location},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePmsZone" parameterType="PmsZone">
+        update pms_zone
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="total != null">total = #{total},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where zone_id = #{zoneId}
+    </update>
+
+    <delete id="deletePmsZoneByZoneId" parameterType="Long">
+        delete from pms_zone where zone_id = #{zoneId}
+    </delete>
+
+    <delete id="deletePmsZoneByZoneIds" parameterType="String">
+        delete from pms_zone where zone_id in 
+        <foreach item="zoneId" collection="array" open="(" separator="," close=")">
+            #{zoneId}
+        </foreach>
+    </delete>
+</mapper>

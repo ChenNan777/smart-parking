@@ -1,0 +1,16 @@
+mqtt:
+  hostUrl: tcp://192.168.2.10:1883
+  username: test
+  password: test
+  client-id: MQTT-CLIENT-DEV
+  cleanSession: true
+  reconnect: true
+  timeout: 100
+  keepAlive: 100
+  defaultTopic: client/dev/report
+  serverTopic: server/dev/report
+  isOpen: true
+  qos: 2
+spring:
+  main:
+    allow-circular-references: true

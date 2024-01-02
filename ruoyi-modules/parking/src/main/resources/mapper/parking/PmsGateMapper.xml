@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.parking.mapper.PmsGateMapper">
+    
+    <resultMap type="PmsGate" id="PmsGateResult">
+        <result property="gateId"    column="gate_id"    />
+        <result property="zoneId"    column="zone_id"    />
+        <result property="deviceId"    column="device_id"    />
+        <result property="type"    column="type"    />
+        <result property="location"    column="location"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectPmsGateVo">
+        select gate_id, zone_id, device_id, type, location, status from pms_gate
+    </sql>
+
+    <select id="selectPmsGateList" parameterType="PmsGate" resultMap="PmsGateResult">
+        <include refid="selectPmsGateVo"/>
+        <where>  
+            <if test="zoneId != null "> and zone_id = #{zoneId}</if>
+            <if test="deviceId != null "> and device_id = #{deviceId}</if>
+            <if test="type != null "> and type = #{type}</if>
+            <if test="location != null  and location != ''"> and location = #{location}</if>
+            <if test="status != null "> and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectPmsGateByGateId" parameterType="Long" resultMap="PmsGateResult">
+        <include refid="selectPmsGateVo"/>
+        where gate_id = #{gateId}
+    </select>
+        
+    <insert id="insertPmsGate" parameterType="PmsGate" useGeneratedKeys="true" keyProperty="gateId">
+        insert into pms_gate
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="zoneId != null">zone_id,</if>
+            <if test="deviceId != null">device_id,</if>
+            <if test="type != null">type,</if>
+            <if test="location != null">location,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="zoneId != null">#{zoneId},</if>
+            <if test="deviceId != null">#{deviceId},</if>
+            <if test="type != null">#{type},</if>
+            <if test="location != null">#{location},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePmsGate" parameterType="PmsGate">
+        update pms_gate
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="zoneId != null">zone_id = #{zoneId},</if>
+            <if test="deviceId != null">device_id = #{deviceId},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="location != null">location = #{location},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where gate_id = #{gateId}
+    </update>
+
+    <delete id="deletePmsGateByGateId" parameterType="Long">
+        delete from pms_gate where gate_id = #{gateId}
+    </delete>
+
+    <delete id="deletePmsGateByGateIds" parameterType="String">
+        delete from pms_gate where gate_id in 
+        <foreach item="gateId" collection="array" open="(" separator="," close=")">
+            #{gateId}
+        </foreach>
+    </delete>
+</mapper>

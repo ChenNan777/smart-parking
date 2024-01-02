@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.parking.mapper.PmsDeniedMapper">
+    
+    <resultMap type="PmsDenied" id="PmsDeniedResult">
+        <result property="deniedId"    column="denied_id"    />
+        <result property="plate"    column="plate"    />
+        <result property="description"    column="description"    />
+        <result property="status"    column="status"    />
+    </resultMap>
+
+    <sql id="selectPmsDeniedVo">
+        select denied_id, plate, description, status from pms_denied
+    </sql>
+
+    <select id="selectPmsDeniedList" parameterType="PmsDenied" resultMap="PmsDeniedResult">
+        <include refid="selectPmsDeniedVo"/>
+        <where>
+            <if test="plate != null  and plate != ''">and plate like concat('%', #{plate}, '%')</if>
+            <if test="description != null  and description != ''">and description like concat('%', #{description},
+                '%')
+            </if>
+            <if test="status != null ">and status = #{status}</if>
+        </where>
+    </select>
+    
+    <select id="selectPmsDeniedByDeniedId" parameterType="Long" resultMap="PmsDeniedResult">
+        <include refid="selectPmsDeniedVo"/>
+        where denied_id = #{deniedId}
+    </select>
+        
+    <insert id="insertPmsDenied" parameterType="PmsDenied" useGeneratedKeys="true" keyProperty="deniedId">
+        insert into pms_denied
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="plate != null and plate != ''">plate,</if>
+            <if test="description != null">description,</if>
+            <if test="status != null">status,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="plate != null and plate != ''">#{plate},</if>
+            <if test="description != null">#{description},</if>
+            <if test="status != null">#{status},</if>
+         </trim>
+    </insert>
+
+    <update id="updatePmsDenied" parameterType="PmsDenied">
+        update pms_denied
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="plate != null and plate != ''">plate = #{plate},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+        </trim>
+        where denied_id = #{deniedId}
+    </update>
+
+    <delete id="deletePmsDeniedByDeniedId" parameterType="Long">
+        delete from pms_denied where denied_id = #{deniedId}
+    </delete>
+
+    <delete id="deletePmsDeniedByDeniedIds" parameterType="String">
+        delete from pms_denied where denied_id in 
+        <foreach item="deniedId" collection="array" open="(" separator="," close=")">
+            #{deniedId}
+        </foreach>
+    </delete>
+</mapper>

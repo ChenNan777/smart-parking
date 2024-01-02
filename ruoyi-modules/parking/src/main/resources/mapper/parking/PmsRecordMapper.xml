@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.parking.mapper.PmsRecordMapper">
+
+    <resultMap type="PmsRecordVO" id="PmsRecordResult">
+        <result property="recordId" column="record_id"/>
+        <result property="plate" column="plate"/>
+        <result property="type" column="type"/>
+        <result property="time" column="time"/>
+        <result property="zoneId" column="zone_id"/>
+        <result property="zoneNane" column="name"/>
+    </resultMap>
+
+    <sql id="selectPmsRecordVo">
+        select record_id, plate, type, time, pms_record.zone_id, pms_zone.name
+        from pms_record, pms_zone
+    </sql>
+
+    <select id="selectPmsRecordList" parameterType="PmsRecordDTO" resultMap="PmsRecordResult">
+        <include refid="selectPmsRecordVo"/>
+        <where>
+            pms_record.zone_id = pms_zone.zone_id
+            <if test="plate != null  and plate != ''">and plate like concat('%', #{plate}, '%')</if>
+            <if test="type != null ">and type = #{type}</if>
+            <if test="timeRange != null">
+                and time BETWEEN #{timeRange[0]} AND #{timeRange[1]}
+            </if>
+            <if test="zoneId != null ">and pms_record.zone_id = #{zoneId}</if>
+        </where>
+    </select>
+
+    <select id="selectPmsRecordByRecordId" parameterType="Long" resultMap="PmsRecordResult">
+        <include refid="selectPmsRecordVo"/>
+        where record_id = #{recordId}
+    </select>
+
+    <insert id="insertPmsRecord" parameterType="PmsRecord" useGeneratedKeys="true" keyProperty="recordId">
+        insert into pms_record
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="plate != null and plate != ''">plate,</if>
+            <if test="type != null">type,</if>
+            <if test="time != null">time,</if>
+            <if test="zoneId != null">zone_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="plate != null and plate != ''">#{plate},</if>
+            <if test="type != null">#{type},</if>
+            <if test="time != null">#{time},</if>
+            <if test="zoneId != null">#{zoneId},</if>
+        </trim>
+    </insert>
+
+    <update id="updatePmsRecord" parameterType="PmsRecord">
+        update pms_record
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="plate != null and plate != ''">plate = #{plate},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="time != null">time = #{time},</if>
+            <if test="zoneId != null">zone_id = #{zoneId},</if>
+        </trim>
+        where record_id = #{recordId}
+    </update>
+
+    <delete id="deletePmsRecordByRecordId" parameterType="Long">
+        delete
+        from pms_record
+        where record_id = #{recordId}
+    </delete>
+
+    <delete id="deletePmsRecordByRecordIds" parameterType="String">
+        delete from pms_record where record_id in
+        <foreach item="recordId" collection="array" open="(" separator="," close=")">
+            #{recordId}
+        </foreach>
+    </delete>
+</mapper>
